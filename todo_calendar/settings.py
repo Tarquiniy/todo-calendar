@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from typing import Any
+import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'planner',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +55,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'todo_calendar.urls'
 
-TEMPLATES = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
@@ -72,11 +76,10 @@ WSGI_APPLICATION = 'todo_calendar.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+DATABASES: dict[str, Any] = {
+    'default': dj_database_url.config(
+        default='postgres://user:password@db:5432/todo_db'
+    )
 }
 
 
