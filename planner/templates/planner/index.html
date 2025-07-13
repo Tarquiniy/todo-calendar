@@ -1,0 +1,10 @@
+<h1>Задачи на {{ today }}</h1>
+<ul>
+{% for note in notes %}
+    <li>{{ note.title }} — {{ note.content }}</li>
+{% empty %}
+    <li>Нет задач</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'add_note' %}">Добавить задачу</a>
