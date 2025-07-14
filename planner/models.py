@@ -14,9 +14,9 @@ class Note(models.Model):
     ]
 
     PRIORITY_CHOICES = [
-        ('LOW', 'Низкая'),
-        ('MEDIUM', 'Средняя'),
-        ('HIGH', 'Высокая'),
+        ('LOW', 'Низкий'),
+        ('MEDIUM', 'Средний'),
+        ('HIGH', 'Высокий'),
     ]
 
     title = models.CharField(max_length=255)

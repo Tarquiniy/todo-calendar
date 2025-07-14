@@ -118,7 +118,6 @@ def calendar_view(request):
 
     return render(request, 'planner/calendar.html')
 
-
 @csrf_exempt
 def update_date(request, note_id):
     """
