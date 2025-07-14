@@ -1,10 +1,89 @@
-<h1>Задачи на {{ today }}</h1>
-<ul>
-{% for note in notes %}
-    <li>{{ note.title }} — {{ note.content }}</li>
-{% empty %}
-    <li>Нет задач</li>
-{% endfor %}
-</ul>
+{% extends 'planner/base.html' %}
+{% load static %}
 
-<a href="{% url 'add_note' %}">Добавить задачу</a>
+{% block content %}
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>📋 Мои задачи</h1>
+    <a href="{% url 'add_note' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Новая задача
+    </a>
+  </div>
+
+  <div class="mb-3">
+    <form method="get" class="row g-2">
+      <div class="col-md-3">
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="🔍 Поиск..."
+               class="form-control">
+      </div>
+      <div class="col-md-3">
+        <select name="status" class="form-select">
+          <option value="">Все статусы</option>
+          <option value="NEW" {% if request.GET.status == 'NEW' %}selected{% endif %}>🆕 Новые</option>
+          <option value="IN_PROGRESS" {% if request.GET.status == 'IN_PROGRESS' %}selected{% endif %}>🚧 В процессе</option>
+          <option value="DONE" {% if request.GET.status == 'DONE' %}selected{% endif %}>✅ Завершенные</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="category" class="form-select">
+          <option value="">Все категории</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-outline-secondary w-100">Применить фильтр</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="alert alert-info">
+    📊 Выполнено: <strong>{{ done_count }}</strong> из <strong>{{ total_count }}</strong>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for note in notes %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ note.title }}</h5>
+          <p class="card-text">{{ note.content|default:"<em>Без описания</em>"|safe }}</p>
+
+          <span class="badge
+            {% if note.status == 'NEW' %}bg-primary
+            {% elif note.status == 'IN_PROGRESS' %}bg-warning text-dark
+            {% else %}bg-success
+            {% endif %}">
+            {{ note.get_status_display }}
+          </span>
+
+          <span class="badge bg-secondary">{{ note.get_priority_display }}</span>
+          {% if note.category %}
+            <span class="badge bg-info">{{ note.category.name }}</span>
+          {% endif %}
+          <p class="mt-2"><small>Дата: {{ note.date }}</small></p>
+
+          {% if note.attachment %}
+            <a href="{{ note.attachment.url }}" class="btn btn-sm btn-outline-secondary mt-2">
+              📎 Вложение
+            </a>
+          {% endif %}
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-between">
+          <a href="{% url 'complete_note' note.id %}" class="btn btn-sm btn-success">✅</a>
+          <a href="{% url 'edit_note' note.id %}" class="btn btn-sm btn-warning">✏️</a>
+          <a href="{% url 'delete_note' note.id %}" class="btn btn-sm btn-danger">🗑️</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <div class="col">
+        <div class="alert alert-light text-center">
+          🙈 Нет задач по выбранным критериям
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

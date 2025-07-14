@@ -1,28 +1,28 @@
-# 📅 ToDo Calendar Planner
+# 📅 Todo Calendar Planner
 
-Планировщик дел с календарём и заметками на Django.
+> Приложение для планирования задач с календарём, фильтрацией и CRUD.
 
-## 🔷 Функционал
-✅ Просмотр задач на текущий день  
-✅ Добавление новых задач с указанием даты и описания  
-✅ База данных (PostgreSQL)  
-✅ Удобная админка для управления записями
+## 🚀 Возможности
+✅ Добавление/редактирование/удаление задач  
+✅ Фильтрация по статусу, дате и категории  
+✅ Календарь с задачами  
+✅ Повторяющиеся задачи  
+✅ Красивый Bootstrap интерфейс  
+✅ CRUD категорий
 
-## 🔷 Технологии
+## 🧰 Технологии
 - Python 3.12
 - Django 5.x
 - PostgreSQL
-- Docker, Docker Compose
-- HTML, CSS (базовый)
+- Docker Compose
+- Bootstrap 5
+- FullCalendar.js
 
 ## 🔷 Установка
 
-### 🚀 Запуск без Docker
+### 🐳 Docker
 ```bash
-git clone https://github.com/Tarquiniy/todo-calendar.git
-cd todo-calendar
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+docker-compose up --build
+docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
