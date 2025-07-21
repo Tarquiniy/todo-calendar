@@ -3,21 +3,29 @@
 
 {% block content %}
 <div class="container my-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>📋 Мои задачи</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4 animated-item" style="animation-delay: 0.1s;">
+    <div>
+      <h1 class="display-5 fw-bold text-gradient">
+        <span class="text-primary">📋</span> Мои задачи
+      </h1>
+      <p class="text-muted">Все ваши задачи в одном месте</p>
+    </div>
     <a href="{% url 'add_note' %}" class="btn btn-primary">
-      <i class="bi bi-plus-circle"></i> Новая задача
+      <i class="bi bi-plus-circle me-2"></i> Новая задача
     </a>
   </div>
 
-  <div class="mb-3">
-    <form method="get" class="row g-2">
-      <div class="col-md-3">
-        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="🔍 Поиск..."
-               class="form-control">
+  <div class="glass-card p-4 mb-4 animated-item" style="animation-delay: 0.2s;">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Поиск..."
+                 class="form-control form-control-lg">
+        </div>
       </div>
       <div class="col-md-3">
-        <select name="status" class="form-select">
+        <select name="status" class="form-select form-select-lg">
           <option value="">Все статусы</option>
           <option value="NEW" {% if request.GET.status == 'NEW' %}selected{% endif %}>🆕 Новые</option>
           <option value="IN_PROGRESS" {% if request.GET.status == 'IN_PROGRESS' %}selected{% endif %}>🚧 В процессе</option>
@@ -25,65 +33,134 @@
         </select>
       </div>
       <div class="col-md-3">
-        <select name="category" class="form-select">
+        <select name="category" class="form-select form-select-lg">
           <option value="">Все категории</option>
           {% for cat in categories %}
             <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-3">
-        <button class="btn btn-outline-secondary w-100">Применить фильтр</button>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100 h-100">
+          <i class="bi bi-funnel me-2"></i>Фильтр
+        </button>
       </div>
     </form>
   </div>
 
-  <div class="alert alert-info">
-    📊 Выполнено: <strong>{{ done_count }}</strong> из <strong>{{ total_count }}</strong>
+  <div class="glass-card p-4 mb-4 animated-item" style="animation-delay: 0.3s;">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex gap-3">
+        <div class="d-flex align-items-center">
+          <span class="status-badge NEW me-2">
+            <i class="bi bi-circle-fill me-1"></i> Новые: {{ new_count }}
+          </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="status-badge IN_PROGRESS me-2">
+            <i class="bi bi-circle-fill me-1"></i> В процессе: {{ in_progress_count }}
+          </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="status-badge DONE">
+            <i class="bi bi-circle-fill me-1"></i> Завершено: {{ done_count }}
+          </span>
+        </div>
+      </div>
+      <div class="text-end">
+        <div class="progress" style="height: 10px; width: 200px;">
+          <div class="progress-bar bg-success" role="progressbar" 
+               style="width: {{ progress_percentage }}%;" 
+               aria-valuenow="{{ progress_percentage }}" 
+               aria-valuemin="0" 
+               aria-valuemax="100"></div>
+        </div>
+        <small class="text-muted">Выполнено {{ done_count }} из {{ total_count }} ({{ progress_percentage }}%)</small>
+      </div>
+    </div>
   </div>
 
-  <div class="row row-cols-1 row-cols-md-3 g-4">
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for note in notes %}
-    <div class="col">
-      <div class="card h-100 shadow-sm">
+    <div class="col animated-item" style="animation-delay: {{ forloop.counter0|divisibleby:2|yesno:'0.3,0.4' }}s">
+      <div class="card h-100 shadow-sm card-hover glass-card">
         <div class="card-body">
-          <h5 class="card-title">{{ note.title }}</h5>
-          <p class="card-text">{{ note.content|default:"<em>Без описания</em>"|safe }}</p>
-
-          <span class="badge
-            {% if note.status == 'NEW' %}bg-primary
-            {% elif note.status == 'IN_PROGRESS' %}bg-warning text-dark
-            {% else %}bg-success
-            {% endif %}">
-            {{ note.get_status_display }}
-          </span>
-
-          <span class="badge bg-secondary">{{ note.get_priority_display }}</span>
-          {% if note.category %}
-            <span class="badge bg-info">{{ note.category.name }}</span>
-          {% endif %}
-          <p class="mt-2"><small>Дата: {{ note.date }}</small></p>
-
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <h5 class="card-title fw-bold mb-0">{{ note.title }}</h5>
+            <span class="status-badge {{ note.status }}">
+              {{ note.get_status_display }}
+            </span>
+          </div>
+          
+          <div class="mb-3">
+            <p class="card-text">{{ note.content|default:"<em>Без описания</em>"|safe }}</p>
+          </div>
+          
+          <div class="mb-3">
+            <div class="d-flex gap-2 flex-wrap">
+              <span class="badge bg-primary">
+                <i class="bi bi-flag me-1"></i>{{ note.get_priority_display }}
+              </span>
+              {% if note.category %}
+                <span class="badge bg-info">
+                  <i class="bi bi-tag me-1"></i>{{ note.category.name }}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="text-muted small mb-3">
+            <div><i class="bi bi-clock me-1"></i> Начало: {{ note.start|date:"d.m.Y H:i" }}</div>
+            {% if note.end %}
+              <div><i class="bi bi-clock me-1"></i> Окончание: {{ note.end|date:"d.m.Y H:i" }}</div>
+            {% endif %}
+          </div>
+          
           {% if note.attachment %}
-            <a href="{{ note.attachment.url }}" class="btn btn-sm btn-outline-secondary mt-2">
-              📎 Вложение
+            <a href="{{ note.attachment.url }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+              <i class="bi bi-paperclip me-1"></i> Вложение
             </a>
           {% endif %}
         </div>
-        <div class="card-footer bg-light d-flex justify-content-between">
-          <a href="{% url 'complete_note' note.id %}" class="btn btn-sm btn-success">✅</a>
-          <a href="{% url 'edit_note' note.id %}" class="btn btn-sm btn-warning">✏️</a>
-          <a href="{% url 'delete_note' note.id %}" class="btn btn-sm btn-danger">🗑️</a>
+        <div class="card-footer bg-transparent d-flex justify-content-between border-0 pt-0">
+          <a href="{% url 'complete_note' note.id %}" class="btn btn-sm btn-success rounded-pill">
+            <i class="bi bi-check-circle"></i>
+          </a>
+          <a href="{% url 'edit_note' note.id %}" class="btn btn-sm btn-warning rounded-pill">
+            <i class="bi bi-pencil"></i>
+          </a>
+          <a href="{% url 'delete_note' note.id %}" class="btn btn-sm btn-danger rounded-pill">
+            <i class="bi bi-trash"></i>
+          </a>
         </div>
       </div>
     </div>
     {% empty %}
-      <div class="col">
-        <div class="alert alert-light text-center">
-          🙈 Нет задач по выбранным критериям
+      <div class="col-12 animated-item" style="animation-delay: 0.4s">
+        <div class="glass-card p-5 text-center">
+          <div class="display-1 text-muted mb-3">🙈</div>
+          <h3 class="mb-3">Нет задач по выбранным критериям</h3>
+          <p class="text-muted">Создайте новую задачу или измените параметры фильтра</p>
+          <a href="{% url 'add_note' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i> Создать задачу
+          </a>
         </div>
       </div>
     {% endfor %}
+  </div>
+  
+  <!-- Навигация между страницами -->
+  <div class="d-flex justify-content-between mt-5">
+    <div>
+      <a href="{% url 'categories' %}" class="btn btn-outline-primary">
+        <i class="bi bi-tags me-2"></i> Управление категориями
+      </a>
+    </div>
+    <div>
+      <a href="{% url 'calendar' %}" class="btn btn-primary">
+        <i class="bi bi-calendar-week me-2"></i> Перейти к календарю
+      </a>
+    </div>
   </div>
 </div>
 {% endblock %}

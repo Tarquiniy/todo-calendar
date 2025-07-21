@@ -1,8 +1,10 @@
 from django.db import models
-from datetime import date
+from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    color = models.CharField(max_length=7, default='#6a11cb')  # Добавлено поле цвета
+    
     def __str__(self):
         return self.name
 
@@ -21,7 +23,8 @@ class Note(models.Model):
 
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True)
-    date = models.DateField(default=date.today)
+    start = models.DateTimeField(default=timezone.now)
+    end = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='NEW')
@@ -31,4 +34,4 @@ class Note(models.Model):
     attachment = models.FileField(upload_to='attachments/', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.title} ({self.date})"
+        return f"{self.title} ({self.start.strftime('%d.%m.%Y %H:%M')})"
